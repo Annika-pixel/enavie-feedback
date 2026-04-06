@@ -105,7 +105,6 @@
     margin-right: 8px;
   }
 
-  /* Star Rating */
   .star-rating {
     display: flex;
     gap: 8px;
@@ -113,9 +112,7 @@
     justify-content: flex-end;
   }
 
-  .star-rating input {
-    display: none;
-  }
+  .star-rating input { display: none; }
 
   .star-rating label {
     cursor: pointer;
@@ -130,11 +127,8 @@
     color: var(--enavie-gold);
   }
 
-  .star-rating label:hover {
-    transform: scale(1.15);
-  }
+  .star-rating label:hover { transform: scale(1.15); }
 
-  /* Option Buttons */
   .options {
     display: flex;
     flex-wrap: wrap;
@@ -164,7 +158,6 @@
     color: white;
   }
 
-  /* Textarea */
   .feedback-textarea {
     width: 100%;
     min-height: 100px;
@@ -179,18 +172,10 @@
     outline: none;
   }
 
-  .feedback-textarea:focus {
-    border-color: var(--enavie-teal);
-  }
+  .feedback-textarea:focus { border-color: var(--enavie-teal); }
+  .feedback-textarea::placeholder { color: #b8b4ae; }
 
-  .feedback-textarea::placeholder {
-    color: #b8b4ae;
-  }
-
-  /* Submit */
-  .submit-section {
-    padding: 0 32px 32px;
-  }
+  .submit-section { padding: 0 32px 32px; }
 
   .submit-btn {
     width: 100%;
@@ -213,9 +198,7 @@
     box-shadow: 0 4px 16px rgba(45, 92, 92, 0.25);
   }
 
-  .submit-btn:active {
-    transform: translateY(0);
-  }
+  .submit-btn:active { transform: translateY(0); }
 
   .submit-btn:disabled {
     background: #c4c0ba;
@@ -224,7 +207,6 @@
     box-shadow: none;
   }
 
-  /* Thank You State */
   .thank-you {
     display: none;
     text-align: center;
@@ -282,11 +264,8 @@
     transition: background 0.2s ease;
   }
 
-  .back-to-shop:hover {
-    background: #234a4a;
-  }
+  .back-to-shop:hover { background: #234a4a; }
 
-  /* Privacy note */
   .privacy-note {
     text-align: center;
     padding: 0 32px 24px;
@@ -294,7 +273,6 @@
     color: #b0ada7;
   }
 
-  /* Mobile */
   @media (max-width: 480px) {
     body { padding: 16px 12px; }
     .feedback-header { padding: 32px 24px; }
@@ -318,7 +296,6 @@
   <div id="formView">
     <div class="feedback-body">
 
-      <!-- Frage 1: Gesamtzufriedenheit -->
       <div class="question">
         <label class="question-label">
           <span class="question-number">1</span>
@@ -333,7 +310,6 @@
         </div>
       </div>
 
-      <!-- Frage 2: Was gefällt dir am besten? -->
       <div class="question">
         <label class="question-label">
           <span class="question-number">2</span>
@@ -349,7 +325,6 @@
         </div>
       </div>
 
-      <!-- Frage 3: Würdest du uns weiterempfehlen? -->
       <div class="question">
         <label class="question-label">
           <span class="question-number">3</span>
@@ -362,7 +337,6 @@
         </div>
       </div>
 
-      <!-- Frage 4: Offenes Feedback -->
       <div class="question">
         <label class="question-label">
           <span class="question-number">4</span>
@@ -374,7 +348,7 @@
     </div>
 
     <div class="submit-section">
-      <button class="submit-btn" id="submitBtn" onclick="submitFeedback()">Feedback absenden</button>
+      <button class="submit-btn" id="submitBtn">Feedback absenden</button>
     </div>
 
     <div class="privacy-note">
@@ -382,7 +356,6 @@
     </div>
   </div>
 
-  <!-- Thank You -->
   <div class="thank-you" id="thankYou">
     <div class="thank-you-icon">
       <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -394,70 +367,58 @@
 </div>
 
 <script>
-  // Multi-select toggle
-  document.querySelectorAll('.multi-select .option-btn').forEach(btn => {
-    btn.addEventListener('click', () => btn.classList.toggle('selected'));
+  document.querySelectorAll('.multi-select .option-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      btn.classList.toggle('selected');
+    });
   });
 
-  // Single-select
-  document.querySelectorAll('.single-select').forEach(group => {
-    group.querySelectorAll('.option-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.single-select').forEach(function(group) {
+    group.querySelectorAll('.option-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        group.querySelectorAll('.option-btn').forEach(function(b) {
+          b.classList.remove('selected');
+        });
         btn.classList.add('selected');
       });
     });
   });
 
-  <script>
-  // Multi-select toggle
-  document.querySelectorAll('.multi-select .option-btn').forEach(btn => {
-    btn.addEventListener('click', () => btn.classList.toggle('selected'));
-  });
-
-  // Single-select
-  document.querySelectorAll('.single-select').forEach(group => {
-    group.querySelectorAll('.option-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-      });
-    });
-  });
-
-  function submitFeedback() {
-    const btn = document.getElementById('submitBtn');
+  document.getElementById('submitBtn').addEventListener('click', function() {
+    var btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.textContent = 'Wird gesendet...';
 
-    const rating = document.querySelector('input[name="rating"]:checked');
-    const likes = [...document.querySelectorAll('.multi-select .option-btn.selected')].map(b => b.dataset.value);
-    const recommend = document.querySelector('.single-select .option-btn.selected');
-    const openText = document.getElementById('openFeedback').value;
+    var ratingEl = document.querySelector('input[name="rating"]:checked');
+    var likeEls = document.querySelectorAll('.multi-select .option-btn.selected');
+    var likes = [];
+    for (var i = 0; i < likeEls.length; i++) {
+      likes.push(likeEls[i].getAttribute('data-value'));
+    }
+    var recommendEl = document.querySelector('.single-select .option-btn.selected');
+    var openText = document.getElementById('openFeedback').value;
 
-    const params = new URLSearchParams({
-      timestamp: new Date().toISOString(),
-      rating: rating ? rating.value : '',
-      likes: likes.join(', '),
-      recommend: recommend ? recommend.dataset.value : '',
-      comment: openText || ''
-    });
-    
-    const url = 'https://script.google.com/macros/s/AKfycbzW8ERFDf8CuVawFlEk1LJKJj-8yxFcKfDi-FBENH1u-aO2kGZdsHcEHuuS_8DffhI/exec?' + params.toString();
-    
-    // Use hidden iframe to handle Google's redirect
-    const iframe = document.createElement('iframe');
+    var params = 'timestamp=' + encodeURIComponent(new Date().toISOString())
+      + '&rating=' + encodeURIComponent(ratingEl ? ratingEl.value : '')
+      + '&likes=' + encodeURIComponent(likes.join(', '))
+      + '&recommend=' + encodeURIComponent(recommendEl ? recommendEl.getAttribute('data-value') : '')
+      + '&comment=' + encodeURIComponent(openText || '');
+
+    var scriptUrl = 'https://script.google.com/macros/s/AKfycbzW8ERFDf8CuVawFlEk1LJKJj-8yxFcKfDi-FBENH1u-aO2kGZdsHcEHuuS_8DffhI/exec?' + params;
+
+    var iframe = document.createElement('iframe');
     iframe.style.display = 'none';
-    iframe.src = url;
+    iframe.name = 'hidden_iframe';
     document.body.appendChild(iframe);
-    
-    // Show thank you after 2 seconds
+    iframe.src = scriptUrl;
+
     setTimeout(function() {
       document.getElementById('formView').style.display = 'none';
       document.getElementById('thankYou').classList.add('show');
-      document.body.removeChild(iframe);
+      try { document.body.removeChild(iframe); } catch(e) {}
     }, 2000);
-  }
+  });
 </script>
+
 </body>
 </html>
