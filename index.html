@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ENAVIE – Dein Feedback</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --enavie-dark: #1a1a1a;
+    --enavie-teal: #2d5c5c;
+    --enavie-gold: #c4a265;
+    --enavie-orange: #e8940e;
+    --enavie-cream: #faf8f5;
+    --enavie-light: #f0ece6;
+    --enavie-white: #ffffff;
+    --enavie-gray: #888888;
+    --enavie-green: #3a7a3a;
+    --enavie-red: #c44040;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--enavie-cream);
+    color: var(--enavie-dark);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+  }
+
+  .feedback-container {
+    max-width: 560px;
+    width: 100%;
+    background: var(--enavie-white);
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    overflow: hidden;
+  }
+
+  .feedback-header {
+    background: var(--enavie-teal);
+    padding: 40px 32px;
+    text-align: center;
+  }
+
+  .feedback-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--enavie-white);
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .feedback-header p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.75);
+    font-weight: 400;
+  }
+
+  .feedback-body {
+    padding: 32px;
+  }
+
+  .question {
+    margin-bottom: 32px;
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .question:nth-child(1) { animation-delay: 0.1s; }
+  .question:nth-child(2) { animation-delay: 0.2s; }
+  .question:nth-child(3) { animation-delay: 0.3s; }
+  .question:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--enavie-dark);
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .question-number {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    background: var(--enavie-teal);
+    color: white;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 24px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+
+  /* Star Rating */
+  .star-rating {
+    display: flex;
+    gap: 8px;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+
+  .star-rating input {
+    display: none;
+  }
+
+  .star-rating label {
+    cursor: pointer;
+    font-size: 32px;
+    color: #d4d0ca;
+    transition: color 0.2s ease, transform 0.15s ease;
+  }
+
+  .star-rating label:hover,
+  .star-rating label:hover ~ label,
+  .star-rating input:checked ~ label {
+    color: var(--enavie-gold);
+  }
+
+  .star-rating label:hover {
+    transform: scale(1.15);
+  }
+
+  /* Option Buttons */
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .option-btn {
+    padding: 10px 18px;
+    border: 1.5px solid #e0dcd6;
+    border-radius: 24px;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--enavie-dark);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .option-btn:hover {
+    border-color: var(--enavie-teal);
+    background: rgba(45, 92, 92, 0.04);
+  }
+
+  .option-btn.selected {
+    border-color: var(--enavie-teal);
+    background: var(--enavie-teal);
+    color: white;
+  }
+
+  /* Textarea */
+  .feedback-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 14px 16px;
+    border: 1.5px solid #e0dcd6;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--enavie-dark);
+    resize: vertical;
+    transition: border-color 0.2s ease;
+    outline: none;
+  }
+
+  .feedback-textarea:focus {
+    border-color: var(--enavie-teal);
+  }
+
+  .feedback-textarea::placeholder {
+    color: #b8b4ae;
+  }
+
+  /* Submit */
+  .submit-section {
+    padding: 0 32px 32px;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--enavie-teal);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.3px;
+  }
+
+  .submit-btn:hover {
+    background: #234a4a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(45, 92, 92, 0.25);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  .submit-btn:disabled {
+    background: #c4c0ba;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Thank You State */
+  .thank-you {
+    display: none;
+    text-align: center;
+    padding: 60px 32px;
+  }
+
+  .thank-you.show {
+    display: block;
+    animation: fadeUp 0.5s ease forwards;
+  }
+
+  .thank-you-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--enavie-teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .thank-you-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: white;
+    stroke-width: 2.5;
+    fill: none;
+  }
+
+  .thank-you h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 400;
+    color: var(--enavie-dark);
+    margin-bottom: 12px;
+  }
+
+  .thank-you p {
+    font-size: 14px;
+    color: var(--enavie-gray);
+    line-height: 1.6;
+  }
+
+  .back-to-shop {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 12px 28px;
+    background: var(--enavie-teal);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+
+  .back-to-shop:hover {
+    background: #234a4a;
+  }
+
+  /* Privacy note */
+  .privacy-note {
+    text-align: center;
+    padding: 0 32px 24px;
+    font-size: 12px;
+    color: #b0ada7;
+  }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    body { padding: 16px 12px; }
+    .feedback-header { padding: 32px 24px; }
+    .feedback-header h1 { font-size: 24px; }
+    .feedback-body { padding: 24px; }
+    .submit-section { padding: 0 24px 24px; }
+    .star-rating label { font-size: 28px; }
+    .options { gap: 6px; }
+    .option-btn { padding: 8px 14px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="feedback-container">
+  <div class="feedback-header">
+    <h1>Dein Feedback</h1>
+    <p>Hilf uns, noch besser zu werden. Dauert nur 1 Minute.</p>
+  </div>
+
+  <div id="formView">
+    <div class="feedback-body">
+
+      <!-- Frage 1: Gesamtzufriedenheit -->
+      <div class="question">
+        <label class="question-label">
+          <span class="question-number">1</span>
+          Wie zufrieden bist du insgesamt mit deinem ENAVIE-Produkt?
+        </label>
+        <div class="star-rating">
+          <input type="radio" name="rating" id="star5" value="5"><label for="star5">&#9733;</label>
+          <input type="radio" name="rating" id="star4" value="4"><label for="star4">&#9733;</label>
+          <input type="radio" name="rating" id="star3" value="3"><label for="star3">&#9733;</label>
+          <input type="radio" name="rating" id="star2" value="2"><label for="star2">&#9733;</label>
+          <input type="radio" name="rating" id="star1" value="1"><label for="star1">&#9733;</label>
+        </div>
+      </div>
+
+      <!-- Frage 2: Was gefällt dir am besten? -->
+      <div class="question">
+        <label class="question-label">
+          <span class="question-number">2</span>
+          Was gefällt dir am besten?
+        </label>
+        <div class="options multi-select" data-name="likes">
+          <button type="button" class="option-btn" data-value="qualitaet">Qualität</button>
+          <button type="button" class="option-btn" data-value="geschmack">Geschmack</button>
+          <button type="button" class="option-btn" data-value="wirkung">Wirkung</button>
+          <button type="button" class="option-btn" data-value="verpackung">Verpackung</button>
+          <button type="button" class="option-btn" data-value="preis-leistung">Preis-Leistung</button>
+          <button type="button" class="option-btn" data-value="inhaltsstoffe">Inhaltsstoffe</button>
+        </div>
+      </div>
+
+      <!-- Frage 3: Würdest du uns weiterempfehlen? -->
+      <div class="question">
+        <label class="question-label">
+          <span class="question-number">3</span>
+          Würdest du ENAVIE weiterempfehlen?
+        </label>
+        <div class="options single-select" data-name="recommend">
+          <button type="button" class="option-btn" data-value="ja">Ja, auf jeden Fall</button>
+          <button type="button" class="option-btn" data-value="vielleicht">Vielleicht</button>
+          <button type="button" class="option-btn" data-value="nein">Eher nicht</button>
+        </div>
+      </div>
+
+      <!-- Frage 4: Offenes Feedback -->
+      <div class="question">
+        <label class="question-label">
+          <span class="question-number">4</span>
+          Möchtest du uns noch etwas mitteilen?
+        </label>
+        <textarea class="feedback-textarea" placeholder="Dein Feedback (optional)..." id="openFeedback"></textarea>
+      </div>
+
+    </div>
+
+    <div class="submit-section">
+      <button class="submit-btn" id="submitBtn" onclick="submitFeedback()">Feedback absenden</button>
+    </div>
+
+    <div class="privacy-note">
+      Deine Angaben werden vertraulich behandelt und nur zur Produktverbesserung genutzt.
+    </div>
+  </div>
+
+  <!-- Thank You -->
+  <div class="thank-you" id="thankYou">
+    <div class="thank-you-icon">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <h2>Vielen Dank!</h2>
+    <p>Dein Feedback hilft uns, ENAVIE noch besser zu machen.<br>Wir schätzen dein Vertrauen.</p>
+    <a href="https://enavie.de" class="back-to-shop">Zurück zum Shop</a>
+  </div>
+</div>
+
+<script>
+  // Multi-select toggle
+  document.querySelectorAll('.multi-select .option-btn').forEach(btn => {
+    btn.addEventListener('click', () => btn.classList.toggle('selected'));
+  });
+
+  // Single-select
+  document.querySelectorAll('.single-select').forEach(group => {
+    group.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+  });
+
+  function submitFeedback() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Wird gesendet...';
+
+    // Collect data
+    const rating = document.querySelector('input[name="rating"]:checked');
+    const likes = [...document.querySelectorAll('.multi-select .option-btn.selected')].map(b => b.dataset.value);
+    const recommend = document.querySelector('.single-select .option-btn.selected');
+    const openText = document.getElementById('openFeedback').value;
+
+    const data = {
+      rating: rating ? rating.value : null,
+      likes: likes,
+      recommend: recommend ? recommend.dataset.value : null,
+      comment: openText,
+      timestamp: new Date().toISOString()
+    };
+
+    // Send to Google Sheet via GET
+    const params = new URLSearchParams({
+      timestamp: data.timestamp,
+      rating: data.rating || '',
+      likes: data.likes.join(', '),
+      recommend: data.recommend || '',
+      comment: data.comment || ''
+    });
+    
+    const url = 'https://script.google.com/macros/s/AKfycbzW8ERFDf8CuVawFlEk1LJKJj-8yxFcKfDi-FBENH1u-aO2kGZdsHcEHuuS_8DffhI/exec?' + params.toString();
+    
+    fetch(url, { mode: 'no-cors' }).then(() => {
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('thankYou').classList.add('show');
+    }).catch(() => {
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('thankYou').classList.add('show');
+    });
+  }
+</script>
+
+</body>
+</html>
