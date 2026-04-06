@@ -1,276 +1,3 @@
-
-1775440727797_image.png
-
-<!DOCTYPE html> <html lang="de"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>ENAVIE – Dein Feedback</title> <style> @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+
-
-pasted
-
-Alles, was wir bei dem anderen Chat E-Mail-Marketing-Kampagne besprochen haben, was mit und und so weiter. Wir sind ja grad dabei, Feedbackseite zu implementieren. Da hab ich mir den Code gegeben, hab ich jetzt eingegeben. Da passt aber jetzt eine Sache noch nicht bauen. Also es soll eigentlich wirklich nur eine Feedbackseite sein. Muss ich da für eine andere Seite nehmen? Also bitte schau dir das einmal an.
-
-03:58
-Ich schaue mir erst mal an, was wir in früheren Chats zur ENAVIE Feedbackseite besprochen haben.
-
-
-Speicher durchsucht
-Speicher durchsucht
-Ok, jetzt hab ich den vollen Kontext. Ich sehe das Problem auf deinem Screenshot: Der HTML-Code, den du in die Shopify-Seite enavie.de/pages/feedback eingefügt hast, wird als eingebettetes Iframe/Element angezeigt, aber die Seite drumherum (Shopify Header, Footer, etc.) ist noch da und es sieht nicht wie eine reine Feedback-Seite aus.
-
-Lass mich das Bild nochmal genauer ansehen.
-
-
-Looking at the uploaded screenshot
-Looking at the uploaded screenshot
-Ok, ich sehe das Problem jetzt klar. Du hast den HTML-Code in eine Shopify Page eingefügt (enavie.de/pages/feedback), aber Shopify rendert das als normalen Page-Content — das heißt der komplette Shopify-Header, Footer und das Seiten-Layout werden drumherum gepackt. Das Feedback-Formular wird als kleines Kästchen innerhalb der Seite angezeigt statt als eigenständige, saubere Seite.
-
-Das Problem ist: Shopify Pages sind nicht dafür gedacht, komplette HTML-Dokumente mit eigenem <html>, <head>, <body> etc. einzubetten. Shopify strippt vieles davon raus oder es kollidiert mit dem Theme.
-
-Du hast zwei Optionen:
-
-Option A (empfohlen): Den Code als eigenständige gehostete Seite nutzen. Du hostest die HTML-Datei extern (z.B. auf Vercel, Netlify, oder als GitHub Page) und verlinkst sie direkt. Das geht super schnell — du hast ja Vercel-Erfahrung. Dann ist der Link z.B. feedback.enavie.de oder enavie-feedback.vercel.app und die Seite sieht exakt so aus wie designed: clean, kein Shopify-Drumherum.
-
-Option B: Den Code für Shopify anpassen. Du entfernst alles außer dem inneren Content (kein <html>, <head>, <body>) und packst nur das CSS als <style> Block und den HTML-Inhalt in den Shopify Custom HTML Editor. Dann passt es sich in die Shopify-Seite ein, sieht aber etwas anders aus weil Shopifys Theme-Styles mit reinfunken.
-
-Meine Empfehlung ist klar Option A — du hast Vercel schon laufen, das ist in 5 Minuten deployed und sieht perfekt aus. Willst du das so machen?
-
-F: Wie willst du die Feedback-Seite hosten?
-A: kann man nicht ein anders template oder so in shopify nehmen
-
-04:01
-Gute Idee! Ja, das geht. Shopify hat verschiedene Page Templates, und manche Themes haben ein "blank" oder "full-width" Template ohne Sidebar und mit minimalem Layout. Aber selbst dann bleiben Header und Footer von Shopify erhalten.
-
-Was du wirklich brauchst, ist ein komplett leeres Template — und das kannst du in Shopify selbst erstellen:
-
-Gehe in Shopify zu Online Store → Themes → Customize
-Oben in der Dropdown wo "Home page" steht → wähle Pages → Feedback
-Schau ob es dort unten die Option gibt, ein anderes Template zuzuweisen (z.B. "page.full-width" oder "page.blank")
-Falls dein Theme kein Blank-Template hat, kannst du eins erstellen:
-
-Gehe zu Online Store → Themes → "..." (drei Punkte) → Code bearbeiten
-Unter Templates klicke "Add a new template"
-Typ: page, Name: feedback
-Das erstellt eine Datei page.feedback.liquid — da packst du dann nur den reinen HTML-Code rein, ohne das normale Shopify-Layout
-Das Problem ist aber: Auch bei einem Custom Template laden Shopifys Theme-Assets (CSS, Fonts) mit und können dein Styling überschreiben.
-
-Willst du es trotzdem über Shopify versuchen? Dann brauchte ich Zugang zum Theme-Code oder du zeigst mir, welche Template-Optionen dir in Shopify angezeigt werden. Oder wir machen es pragmatisch über Vercel — da hast du in 5 Minuten ein perfektes Ergebnis ohne Shopify-Kämpfe.
-
-F: Wie willst du weitermachen?
-A: Lass uns das Custom Template im Code machen
-
-04:03
-Ok, dann machen wir das Custom Template. So gehst du vor:
-
-Schritt 1: Template-Datei erstellen
-
-Gehe zu Online Store → Themes
-Klicke bei deinem aktiven Theme auf die drei Punkte (...) → Code bearbeiten
-Links siehst du die Ordnerstruktur. Suche den Ordner Templates
-Klicke "Add a new template"
-Typ: page — Name: feedback
-Shopify erstellt jetzt page.feedback.liquid (oder bei neueren Themes evtl. page.feedback.json)
-Schritt 2: Template-Code einfügen
-
-Lösche alles was in der neuen Datei steht und ersetze es mit diesem Code — das ist ein komplett eigenständiges Template das Shopifys Layout umgeht:
-
-liquid
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ENAVIE – Dein Feedback</title>
-  {{ content_for_header }}
-</head>
-<body>
-  {{ page.content }}
-</body>
-</html>
-Das {{ content_for_header }} muss drin bleiben — Shopify braucht das für Analytics/Tracking. Aber es lädt kein Theme-CSS, keinen Header, keinen Footer.
-
-Schritt 3: Speichern
-
-Schritt 4: Template der Feedback-Seite zuweisen
-
-Gehe zu Online Store → Pages → Feedback
-Rechts in der Sidebar siehst du "Theme template" — dort steht wahrscheinlich "Default page"
-Ändere das auf page.feedback
-Speichern
-Schritt 5: HTML-Code einfügen
-
-In der gleichen Feedback-Seite: Im Content-Editor wechsle auf "<> HTML anzeigen" (oder "Show HTML") und füge dort den kompletten Inhalt ein — aber nur den Inhalt innerhalb von <body>, also ab <style>...</style> und den <div class="feedback-container">...</div> Block plus das <script>. Nicht das <html>, <head>, <body> Tag nochmal — das kommt ja vom Template.
-
-Schick mir einen Screenshot wenn du bei Schritt 2 bist oder wenn etwas anders aussieht als erwartet (z.B. wenn Shopify dir eine .json Datei statt .liquid erstellt — dann müssen wir es etwas anders machen).
-
-ne lass uns das mit vercel machen
-
-04:04
-Ok, dann machen wir es über Vercel. Ich bereite dir die Datei vor — du musst sie nur in ein neues Repo pushen und deployen.
-
-
-Datei erstellt, datei lesen
-Datei erstellt, datei lesen
-Hier ist die fertige Datei. So deployst du sie:
-
-Erstelle ein neues GitHub Repo — z.B. enavie-feedback
-Lade die index.html dort hoch (einfach per GitHub Web-UI "Add file")
-Gehe in Vercel → New Project → verbinde das Repo
-Vercel erkennt automatisch dass es eine statische HTML-Seite ist — einfach deployen
-Du bekommst eine URL wie enavie-feedback.vercel.app
-Optional kannst du danach in Cloudflare DNS einen CNAME feedback.enavie.de → auf die Vercel-URL setzen. Dann hast du eine saubere Custom Domain.
-
-Den Link feedback.enavie.de (oder die Vercel-URL) nutzt du dann in deinem Brevo Flow 3 als Button-Link in der Feedback-Mail.
-
-Index
-Code · HTML 
-1775442058181_image.png
-ist es jetzt schon deployed oder was:
-
-04:21
-Ja, das ist deployed! Alles grün — Build Logs ✅, Deployment Summary ✅, Custom Domains ✅. Das ging schnell.
-
-Deine Seite ist jetzt live. Klicke oben im Vercel Dashboard auf "Visit" oder gehe direkt zu deiner Vercel-URL (sollte sowas sein wie enavie-feedback.vercel.app oder falls du schon eine Custom Domain zugewiesen hast, die).
-
-Teste einmal ob das Formular sauber aussieht und ob der Submit funktioniert (also ob die Daten in deinem Google Sheet ankommen). Dann kannst du den Link in deiner Brevo Feedback-Mail im Flow 3 einbauen.
-
-1775442168984_image.png
-ok das ist es: https://enavie-feedback.vercel.app/ aber in meinem sheets ist noch das alte feedback wann aktualisert das? Dachte das passiert automatisch
-
-04:22
-Das läuft schon automatisch! Was du im Screenshot siehst ist der Test den du gerade gemacht hast — Zeile 2 mit dem Timestamp 2026-04-06T01:53:06 und "alles super!" als Kommentar. Das ist von eben, oder?
-
-Jedes Mal wenn jemand auf der neuen Seite "Feedback absenden" klickt, wird automatisch eine neue Zeile im Google Sheet angelegt. Das funktioniert also bereits.
-
-Falls du meinst, dass da noch alte Daten von einer früheren Version fehlen — das Google Apps Script schreibt nur neue Einträge ab jetzt rein. Alte Feedback-Daten die über eine andere Methode gesammelt wurden, landen nicht automatisch hier.
-
-Die Feedback-Seite ist jetzt komplett fertig. Nächster Schritt: Den Link https://enavie-feedback.vercel.app/ in deinem Brevo Flow 3 als Button-URL in der Feedback-Mail einbauen. Willst du optional noch eine Custom Domain wie feedback.enavie.de über Cloudflare einrichten, oder reicht die Vercel-URL?
-
-ja aber hab gerade was abgeschickt und es ist noch ned da
-
-04:23
-Hmm, das kann an einem Timing-Problem liegen. Probier mal folgendes:
-
-Lade das Google Sheet einmal neu (F5)
-Schau ob die neue Zeile jetzt da ist
-Falls nicht, liegt es wahrscheinlich daran, dass der fetch mit mode: 'no-cors' zwar abgeschickt wird, aber das Google Apps Script die Anfrage nicht verarbeitet. Das passiert manchmal wenn das Script nicht richtig als Web-App deployed ist.
-
-Prüfe einmal in deinem Google Apps Script:
-
-Öffne das Script (Erweiterungen → Apps Script im Google Sheet)
-Klicke oben rechts auf "Bereitstellen" → "Bereitstellungen verwalten"
-Stelle sicher dass dort steht: Zugriff: Jeder (nicht "Jeder mit Google-Konto")
-Falls du Änderungen am Script gemacht hast, musst du eine neue Bereitstellung erstellen (nicht die bestehende bearbeiten) — Google cached die alte Version
-Kannst du mir einen Screenshot vom Apps Script Code und den Bereitstellungs-Einstellungen zeigen? Dann sehe ich sofort wo es hakt.
-
-1775442268097_image.png
-1775442282470_image.png
-1775442294735_image.png
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-  
-  sheet.appendRow([
-    data.timestamp,
-    data.rating,
-    data.likes.join(", "),
-    data.recommend,
-    data.comment
-  ]);
-  
-  return ContentService
-    .createTextOutput(JSON.stringify({status: "ok"}))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  
-  var data = {
-    timestamp: e.parameter.timestamp,
-    rating: e.parameter.rating,
-    likes: e.parameter.likes || "",
-    recommend: e.parameter.recommend || "",
-    comment: e.parameter.comment || ""
-  };
-  
-  sheet.appendRow([
-    data.timestamp,
-    data.rating,
-    data.likes,
-    data.recommend,
-    data.comment
-  ]);
-  
-  return ContentService
-    .createTextOutput(JSON.stringify({status: "ok"}))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-Mehr anzeigen
-04:24
-Die Bereitstellung sieht korrekt aus — Zugriffsberechtigte: Jeder ✅, Web-App URL stimmt ✅.
-
-Das Problem ist ein anderes: Dein HTML-Code schickt die Daten per fetch mit mode: 'no-cors'. Das funktioniert grundsätzlich, aber bei Google Apps Script kann es sein, dass die Anfrage als Redirect zurückkommt (Google leitet von /macros/s/... auf eine andere URL um) und no-cors Redirects manchmal schluckt.
-
-Der erste Eintrag in deinem Sheet kam wahrscheinlich durch, weil du es direkt im Browser getestet hast (GET-Request über die URL-Leiste). Neue Submits über die Vercel-Seite kommen nicht an.
-
-Der Fix ist einfach — wir ändern den fetch-Aufruf so, dass er als unsichtbares Bild geladen wird statt über fetch. Das umgeht das CORS/Redirect-Problem komplett. Scroll in deinem GitHub Repo zur index.html und ersetze die submitFeedback() Funktion mit dieser Version:
-
-javascript
-function submitFeedback() {
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Wird gesendet...';
-
-    const rating = document.querySelector('input[name="rating"]:checked');
-    const likes = [...document.querySelectorAll('.multi-select .option-btn.selected')].map(b => b.dataset.value);
-    const recommend = document.querySelector('.single-select .option-btn.selected');
-    const openText = document.getElementById('openFeedback').value;
-
-    const params = new URLSearchParams({
-      timestamp: new Date().toISOString(),
-      rating: rating ? rating.value : '',
-      likes: likes.join(', '),
-      recommend: recommend ? recommend.dataset.value : '',
-      comment: openText || ''
-    });
-    
-    const url = 'https://script.google.com/macros/s/AKfycbzW8ERFDf8CuVawFlEk1LJKJj-8yxFcKfDi-FBENH1u-aO2kGZdsHcEHuuS_8DffhI/exec?' + params.toString();
-    
-    // Use image trick to avoid CORS/redirect issues
-    const img = new Image();
-    img.onload = img.onerror = function() {
-      document.getElementById('formView').style.display = 'none';
-      document.getElementById('thankYou').classList.add('show');
-    };
-    img.src = url;
-}
-Der Trick: Ein new Image() mit der URL als src macht einen einfachen GET-Request, folgt automatisch allen Redirects, und hat keine CORS-Probleme. Das onerror feuert trotzdem (weil die Antwort kein Bild ist), aber die Daten kommen an.
-
-Ändere das in deinem GitHub Repo, Vercel deployed automatisch neu, und teste dann nochmal.
-
-
-<!DOCTYPE html> <html lang="de"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>ENAVIE – Dein Feedback</title> <style> @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wg
-
-pasted
-
-bitte gib mir den ganzen code:
-
-04:26
-Hier ist der komplette Code mit dem Image-Trick Fix:
-
-
-2 Dateien erstellt, hat einen Befehl ausgeführt, datei lesen
-2 Dateien erstellt, hat einen Befehl ausgeführt, datei lesen
-Die einzige Änderung ist in der submitFeedback() Funktion — statt fetch mit mode: 'no-cors' wird jetzt ein new Image() verwendet. Ersetze die Datei in deinem GitHub Repo, Vercel deployed automatisch, und teste dann nochmal ob die Daten im Sheet ankommen.
-
-Index
-Code · HTML 
-
-
-
-
-Claude ist eine KI und kann Fehler machen. Bitte überprüfe die Antworten.
-Index · HTML
-Kopieren
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -279,7 +6,7 @@ Kopieren
 <title>ENAVIE – Dein Feedback</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@400;500;600&display=swap');
- 
+
   :root {
     --enavie-dark: #1a1a1a;
     --enavie-teal: #2d5c5c;
@@ -292,9 +19,9 @@ Kopieren
     --enavie-green: #3a7a3a;
     --enavie-red: #c44040;
   }
- 
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
- 
+
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--enavie-cream);
@@ -305,7 +32,7 @@ Kopieren
     align-items: flex-start;
     padding: 40px 20px;
   }
- 
+
   .feedback-container {
     max-width: 560px;
     width: 100%;
@@ -314,13 +41,13 @@ Kopieren
     box-shadow: 0 4px 24px rgba(0,0,0,0.06);
     overflow: hidden;
   }
- 
+
   .feedback-header {
     background: var(--enavie-teal);
     padding: 40px 32px;
     text-align: center;
   }
- 
+
   .feedback-header h1 {
     font-family: 'Cormorant Garamond', serif;
     font-size: 28px;
@@ -329,33 +56,33 @@ Kopieren
     letter-spacing: 0.5px;
     margin-bottom: 8px;
   }
- 
+
   .feedback-header p {
     font-size: 14px;
     color: rgba(255,255,255,0.75);
     font-weight: 400;
   }
- 
+
   .feedback-body {
     padding: 32px;
   }
- 
+
   .question {
     margin-bottom: 32px;
     opacity: 0;
     transform: translateY(12px);
     animation: fadeUp 0.5s ease forwards;
   }
- 
+
   .question:nth-child(1) { animation-delay: 0.1s; }
   .question:nth-child(2) { animation-delay: 0.2s; }
   .question:nth-child(3) { animation-delay: 0.3s; }
   .question:nth-child(4) { animation-delay: 0.4s; }
- 
+
   @keyframes fadeUp {
     to { opacity: 1; transform: translateY(0); }
   }
- 
+
   .question-label {
     font-size: 15px;
     font-weight: 600;
@@ -363,7 +90,7 @@ Kopieren
     margin-bottom: 12px;
     display: block;
   }
- 
+
   .question-number {
     display: inline-block;
     width: 24px;
@@ -377,7 +104,7 @@ Kopieren
     font-weight: 600;
     margin-right: 8px;
   }
- 
+
   /* Star Rating */
   .star-rating {
     display: flex;
@@ -385,35 +112,35 @@ Kopieren
     flex-direction: row-reverse;
     justify-content: flex-end;
   }
- 
+
   .star-rating input {
     display: none;
   }
- 
+
   .star-rating label {
     cursor: pointer;
     font-size: 32px;
     color: #d4d0ca;
     transition: color 0.2s ease, transform 0.15s ease;
   }
- 
+
   .star-rating label:hover,
   .star-rating label:hover ~ label,
   .star-rating input:checked ~ label {
     color: var(--enavie-gold);
   }
- 
+
   .star-rating label:hover {
     transform: scale(1.15);
   }
- 
+
   /* Option Buttons */
   .options {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
   }
- 
+
   .option-btn {
     padding: 10px 18px;
     border: 1.5px solid #e0dcd6;
@@ -425,18 +152,18 @@ Kopieren
     cursor: pointer;
     transition: all 0.2s ease;
   }
- 
+
   .option-btn:hover {
     border-color: var(--enavie-teal);
     background: rgba(45, 92, 92, 0.04);
   }
- 
+
   .option-btn.selected {
     border-color: var(--enavie-teal);
     background: var(--enavie-teal);
     color: white;
   }
- 
+
   /* Textarea */
   .feedback-textarea {
     width: 100%;
@@ -451,20 +178,20 @@ Kopieren
     transition: border-color 0.2s ease;
     outline: none;
   }
- 
+
   .feedback-textarea:focus {
     border-color: var(--enavie-teal);
   }
- 
+
   .feedback-textarea::placeholder {
     color: #b8b4ae;
   }
- 
+
   /* Submit */
   .submit-section {
     padding: 0 32px 32px;
   }
- 
+
   .submit-btn {
     width: 100%;
     padding: 16px;
@@ -479,36 +206,36 @@ Kopieren
     transition: all 0.25s ease;
     letter-spacing: 0.3px;
   }
- 
+
   .submit-btn:hover {
     background: #234a4a;
     transform: translateY(-1px);
     box-shadow: 0 4px 16px rgba(45, 92, 92, 0.25);
   }
- 
+
   .submit-btn:active {
     transform: translateY(0);
   }
- 
+
   .submit-btn:disabled {
     background: #c4c0ba;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
   }
- 
+
   /* Thank You State */
   .thank-you {
     display: none;
     text-align: center;
     padding: 60px 32px;
   }
- 
+
   .thank-you.show {
     display: block;
     animation: fadeUp 0.5s ease forwards;
   }
- 
+
   .thank-you-icon {
     width: 64px;
     height: 64px;
@@ -519,7 +246,7 @@ Kopieren
     justify-content: center;
     margin: 0 auto 20px;
   }
- 
+
   .thank-you-icon svg {
     width: 28px;
     height: 28px;
@@ -527,7 +254,7 @@ Kopieren
     stroke-width: 2.5;
     fill: none;
   }
- 
+
   .thank-you h2 {
     font-family: 'Cormorant Garamond', serif;
     font-size: 26px;
@@ -535,13 +262,13 @@ Kopieren
     color: var(--enavie-dark);
     margin-bottom: 12px;
   }
- 
+
   .thank-you p {
     font-size: 14px;
     color: var(--enavie-gray);
     line-height: 1.6;
   }
- 
+
   .back-to-shop {
     display: inline-block;
     margin-top: 24px;
@@ -554,11 +281,11 @@ Kopieren
     font-weight: 500;
     transition: background 0.2s ease;
   }
- 
+
   .back-to-shop:hover {
     background: #234a4a;
   }
- 
+
   /* Privacy note */
   .privacy-note {
     text-align: center;
@@ -566,7 +293,7 @@ Kopieren
     font-size: 12px;
     color: #b0ada7;
   }
- 
+
   /* Mobile */
   @media (max-width: 480px) {
     body { padding: 16px 12px; }
@@ -581,16 +308,16 @@ Kopieren
 </style>
 </head>
 <body>
- 
+
 <div class="feedback-container">
   <div class="feedback-header">
     <h1>Dein Feedback</h1>
     <p>Hilf uns, noch besser zu werden. Dauert nur 1 Minute.</p>
   </div>
- 
+
   <div id="formView">
     <div class="feedback-body">
- 
+
       <!-- Frage 1: Gesamtzufriedenheit -->
       <div class="question">
         <label class="question-label">
@@ -605,7 +332,7 @@ Kopieren
           <input type="radio" name="rating" id="star1" value="1"><label for="star1">&#9733;</label>
         </div>
       </div>
- 
+
       <!-- Frage 2: Was gefällt dir am besten? -->
       <div class="question">
         <label class="question-label">
@@ -621,7 +348,7 @@ Kopieren
           <button type="button" class="option-btn" data-value="inhaltsstoffe">Inhaltsstoffe</button>
         </div>
       </div>
- 
+
       <!-- Frage 3: Würdest du uns weiterempfehlen? -->
       <div class="question">
         <label class="question-label">
@@ -634,7 +361,7 @@ Kopieren
           <button type="button" class="option-btn" data-value="nein">Eher nicht</button>
         </div>
       </div>
- 
+
       <!-- Frage 4: Offenes Feedback -->
       <div class="question">
         <label class="question-label">
@@ -643,18 +370,18 @@ Kopieren
         </label>
         <textarea class="feedback-textarea" placeholder="Dein Feedback (optional)..." id="openFeedback"></textarea>
       </div>
- 
+
     </div>
- 
+
     <div class="submit-section">
       <button class="submit-btn" id="submitBtn" onclick="submitFeedback()">Feedback absenden</button>
     </div>
- 
+
     <div class="privacy-note">
       Deine Angaben werden vertraulich behandelt und nur zur Produktverbesserung genutzt.
     </div>
   </div>
- 
+
   <!-- Thank You -->
   <div class="thank-you" id="thankYou">
     <div class="thank-you-icon">
@@ -665,13 +392,13 @@ Kopieren
     <a href="https://enavie.de" class="back-to-shop">Zurück zum Shop</a>
   </div>
 </div>
- 
+
 <script>
   // Multi-select toggle
   document.querySelectorAll('.multi-select .option-btn').forEach(btn => {
     btn.addEventListener('click', () => btn.classList.toggle('selected'));
   });
- 
+
   // Single-select
   document.querySelectorAll('.single-select').forEach(group => {
     group.querySelectorAll('.option-btn').forEach(btn => {
@@ -681,17 +408,17 @@ Kopieren
       });
     });
   });
- 
+
   function submitFeedback() {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.textContent = 'Wird gesendet...';
- 
+
     const rating = document.querySelector('input[name="rating"]:checked');
     const likes = [...document.querySelectorAll('.multi-select .option-btn.selected')].map(b => b.dataset.value);
     const recommend = document.querySelector('.single-select .option-btn.selected');
     const openText = document.getElementById('openFeedback').value;
- 
+
     const params = new URLSearchParams({
       timestamp: new Date().toISOString(),
       rating: rating ? rating.value : '',
@@ -711,6 +438,6 @@ Kopieren
     img.src = url;
   }
 </script>
- 
+
 </body>
 </html>
