@@ -409,6 +409,22 @@
     });
   });
 
+  <script>
+  // Multi-select toggle
+  document.querySelectorAll('.multi-select .option-btn').forEach(btn => {
+    btn.addEventListener('click', () => btn.classList.toggle('selected'));
+  });
+
+  // Single-select
+  document.querySelectorAll('.single-select').forEach(group => {
+    group.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+    });
+  });
+
   function submitFeedback() {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
@@ -429,15 +445,19 @@
     
     const url = 'https://script.google.com/macros/s/AKfycbzW8ERFDf8CuVawFlEk1LJKJj-8yxFcKfDi-FBENH1u-aO2kGZdsHcEHuuS_8DffhI/exec?' + params.toString();
     
-    // Use image trick to avoid CORS/redirect issues with Google Apps Script
-    const img = new Image();
-    img.onload = img.onerror = function() {
+    // Use hidden iframe to handle Google's redirect
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    
+    // Show thank you after 2 seconds
+    setTimeout(function() {
       document.getElementById('formView').style.display = 'none';
       document.getElementById('thankYou').classList.add('show');
-    };
-    img.src = url;
+      document.body.removeChild(iframe);
+    }, 2000);
   }
 </script>
-
 </body>
 </html>
